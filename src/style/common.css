@@ -1,0 +1,9 @@
+.et-wrapper.et-top {
+    top: 20px;
+}
+
+.et-wrapper.et-right {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
