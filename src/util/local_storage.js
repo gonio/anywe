@@ -1,5 +1,5 @@
 /**
- * Created by ued on 2015/10/13.
+ * localStorage的封装
  */
 
 function getStorage (...args) {

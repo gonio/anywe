@@ -1,8 +1,4 @@
 /**
- * Created by ued on 2016/11/7.
- */
-
-/**
  * UI 日志接口封装
  * @param   {String}   type 日志类型
  * @returns {Function}      返回实际接口
