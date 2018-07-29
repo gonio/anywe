@@ -42,7 +42,7 @@ module.exports = {
         // }],
         // allow optionalDependencies
         'import/no-extraneous-dependencies': ['error', {
-            optionalDependencies: ['test/unit/index.js']
+            optionalDependencies: ['test/unit/main.js']
         }],
         // allow debugger during development
         'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
@@ -59,6 +59,7 @@ module.exports = {
         'no-mixed-operators': 0,
         'no-plusplus': 0,
         'consistent-return': 0,
-        'no-shadow': 0
+        'no-shadow': 0,
+        'no-new': 0
     }
 };
