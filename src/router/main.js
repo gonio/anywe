@@ -1,9 +1,11 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import VModal from 'vue-js-modal';
 import Index from '../components/Index';
 import Login from '../components/Login';
 import Main from '../components/Main';
 
+Vue.use(VModal, { dialog: true });
 Vue.use(Router);
 
 export default new Router({

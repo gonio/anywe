@@ -1,6 +1,5 @@
 <template>
-    <div class="hello">
-        <h1>{{title}}</h1>
+    <modal class="hello" :name="name">
         <div v-if="isLogin">
             <div>
                 <label for="user">用户名：</label>
@@ -30,18 +29,23 @@
             <div class="btn btn-primary btn-lg" @click="signUp">注册</div>
             <div class="btn btn-primary btn-lg" @click="back">返回登录</div>
         </div>
-    </div>
+    </modal>
 </template>
 
 <script>
     export default {
+        props: {
+            name: {
+                type: String,
+                default: 'loginModal'
+            },
+        },
         data () {
             return {
-                title: '登录',
                 user: '',
                 password: '',
                 confirmPassword: '',
-                isLogin: true
+                isLogin: this.name === 'loginModal'
             };
         },
         methods: {
