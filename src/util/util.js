@@ -72,3 +72,13 @@ export function isPromise (val) {
 export function assert (condition, msg) {
     if (!condition) throw new Error(`[vuex] ${msg}`);
 }
+
+/**
+ * 获取范围随机数
+ * @param min   {number}    最小值
+ * @param max   {number}    最大值
+ * @returns {number}
+ */
+export function getRandom (min = 0, max = 9) {
+    return parseInt(Math.random() * 10000000 % max, 10) + min;
+}

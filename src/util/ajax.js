@@ -12,9 +12,16 @@ export default {
 function install (Vue) {
     // Axios.defaults.headers.post['Content-Type'] = 'application/json';
     // Axios.defaults.baseURL = '/hyz';
-    Axios.interceptors.response.use(response => response.data, (error) => {
+    Axios.interceptors.response.use(({ data }) => {
+        if (!data.success) {
+            Vue.toast(data.msg || '与服务器通讯失败！');
+            return null;
+        }
+        return data.data;
+    }, (error) => {
         logger.error(error);
-        return Promise.resolve({ success: false, msg: '与服务器通讯失败！' });
+        Vue.toast('与服务器通讯失败！');
+        return Promise.resolve(null);
     });
 
     Vue.Axios = Axios;

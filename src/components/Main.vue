@@ -40,9 +40,7 @@
             async initBlogData () {
                 const loader = this.$loading.show();
                 const response = await this.Axios.post('init');
-                if (!response.success) {
-                    this.$toast(response.msg);
-                } else {
+                if (response) {
                     this.isInit = true;
                     this.name = response.data.name;
                     this.titleList = response.data.titleList || [];

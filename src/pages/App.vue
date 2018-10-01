@@ -7,7 +7,7 @@
                         <router-link :to="nav.path" :class="{active: nav.actived}">{{nav.text}}</router-link>
                     </div>
                 </div>
-                <div class="col-sm-4 col-md-3 col-lg-3">
+                <div v-if="!isLogin" class="col-sm-4 col-md-3 col-lg-3">
                     <div>
                         <div class="header-menu header-login" @click="onClickLogin">立即登录</div>
                         <login name="loginModal"/>
@@ -29,12 +29,12 @@
         data () {
             const navs = [{
                 path: '/',
-                text: '首页'
+                text: '连连看'
             }, {
                 path: '/qa',
                 text: '问答'
             }, {
-                path: '/alarm',
+                path: '/main',
                 text: '专栏'
             }, {
                 path: '/class',
@@ -45,8 +45,20 @@
             });
 
             return {
-                navs
+                navs,
+                isLogin: false
             };
+        },
+        async beforeCreate () {
+            const response = await this.Axios.post('init');
+            if (response) {
+                this.$store.dispatch({
+                    type: 'updateLoginInfo',
+                    userName: response.userName,
+                    isLogin: response.isLogin
+                });
+                this.isLogin = response.isLogin;
+            }
         },
         methods: {
             setActiveTab () {

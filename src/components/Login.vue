@@ -1,5 +1,5 @@
 <template>
-    <modal class="hello" :name="name" height="auto" :title="我十一个">
+    <modal class="hello" :name="name" height="auto" title="我十一个">
         <div v-if="isLogin" class="login-content">
             <div class="form-group">
                 <label for="username" class="control-label">手机号 或 Email</label>
@@ -76,9 +76,7 @@
             async login () {
                 const loader = this.$loading.show();
                 const response = await this.Axios.post('login', { user: this.user, pwd: this.password });
-                if (!response.success) {
-                    this.$toast(response.msg);
-                } else {
+                if (response) {
                     this.setUserInfo();
                     this.$router.push('/main');
                 }
@@ -94,9 +92,7 @@
                 }
                 const loader = this.$loading.show();
                 const response = await this.Axios.post('signUp', { user: this.user, pwd: this.password });
-                if (!response.success) {
-                    this.$toast(response.msg);
-                } else {
+                if (response) {
                     this.$toast('注册成功');
                     this.back();
                 }
@@ -124,7 +120,8 @@
             setUserInfo () {
                 this.$store.dispatch({
                     type: 'updateLoginInfo',
-                    name: this.user
+                    userName: this.user,
+                    isLogin: true
                 });
             }
         }

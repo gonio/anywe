@@ -1,12 +1,14 @@
 // initial state
 // shape: [{ id, quantity }]
 const state = {
-    name: ''
+    userName: '',
+    isLogin: false
 };
 
 // getters
 const getters = {
-    userName: state => state.name,
+    userName: state => state.userName,
+    isLogin: state => state.isLogin,
 };
 
 // actions
