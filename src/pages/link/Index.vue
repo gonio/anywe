@@ -1,6 +1,6 @@
 <template>
     <div class="index-content">
-        <block v-for="n in 40" :key="n" :is-show="map[n-1]" :type="showType(map[n-1])"></block>
+        <block v-for="n in 400" :key="n" :is-show="map[n-1]" :type="showType(map[n-1])"></block>
     </div>
 </template>
 
@@ -13,11 +13,49 @@
     // 列、排方块的数量
     const col = 20;
 
+    /**
+     * 获取随机方块类型
+     * @returns {number}
+     */
+    function getType () {
+        const random = getRandom();
+        if (type[random] < 1) {
+            return getExistType(random);
+        }
+        type[random]--;
+        return random;
+    }
+
+    /**
+     * 根据当前的随机数，寻找其右边、左边的还剩下的方块类型
+     * @param random    {number}    随机数
+     * @returns {number}
+     */
+    function getExistType (random = 0) {
+        const typeNum = 10;
+
+        // 先寻找右边的还存在的类型
+        for (; random < typeNum; random++) {
+            if (type[random] > 0) {
+                type[random]--;
+                return random;
+            }
+        }
+
+        // 在寻找其左边的还存在的类型
+        for (let i = 0; i < random; i++) {
+            if (type[i] > 0) {
+                type[i]--;
+                return i;
+            }
+        }
+        return -1;
+    }
+
     export default {
         data () {
             return {
-                map: map1,
-                count: 0
+                map: map1
             };
         },
         components: {
@@ -41,21 +79,16 @@
                     this.coordinate[i].push(item);
                 });
             },
-            getType () {
-                const random = getRandom();
-                window.console.log('get');
-                --type[random];
-                // if (--this.type[random] < 0) {
-                //     return this.getType();
-                // }
-                return type[random];
-            },
+            /**
+             * 显示类型的计算
+             * @param isShow    {number}    1为显示，0为隐藏
+             * @returns {number}
+             */
             showType (isShow) {
-                this.count++;
                 if (isShow === 1) {
-                    return this.getType();
+                    return getType();
                 }
-                return 0;
+                return -1;
             }
         }
     };

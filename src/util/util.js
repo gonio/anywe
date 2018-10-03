@@ -80,5 +80,5 @@ export function assert (condition, msg) {
  * @returns {number}
  */
 export function getRandom (min = 0, max = 9) {
-    return parseInt(Math.random() * 10000000 % max, 10) + min;
+    return parseInt(Math.random() * 10000000 % (max + 1), 10) + min;
 }
