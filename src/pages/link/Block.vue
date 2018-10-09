@@ -1,5 +1,5 @@
 <template>
-    <div class="block-item" :class="showClass" @click="selected =! selected">
+    <div class="block-item" :class="showClass" @click="onSelect">
         <i :class="showType"></i>
     </div>
 </template>
@@ -24,6 +24,11 @@
             return {
                 selected: false
             };
+        },
+        methods: {
+            onSelect () {
+                this.$emit('select', this);
+            }
         },
         computed: {
             showClass () {

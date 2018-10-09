@@ -1,6 +1,9 @@
 <template>
     <div class="index-content">
-        <block v-for="n in 400" :key="n" :is-show="map[n-1]" :type="showType(map[n-1])"></block>
+        <block v-for="n in 400" :key="n" ref="blocks"
+               :is-show="map[n-1]"
+               :type="showType(map[n-1])"
+               @select="select"></block>
     </div>
 </template>
 
@@ -29,7 +32,7 @@
     /**
      * 根据当前的随机数，寻找其右边、左边的还剩下的方块类型
      * @param random    {number}    随机数
-     * @returns {number}
+     * @returns         {number}
      */
     function getExistType (random = 0) {
         const typeNum = 10;
@@ -71,12 +74,12 @@
             initCoordinate () {
                 let i = 0;
                 this.coordinate = {};
-                this.map.forEach((item, key) => {
+                this.$refs.blocks.forEach((item, key) => {
+                    this.coordinate[i] = this.coordinate[i] || [];
+                    this.coordinate[i].push(item);
                     if (key % col === 0) {
                         i++;
                     }
-                    this.coordinate[i] = this.coordinate[i] || [];
-                    this.coordinate[i].push(item);
                 });
             },
             /**
@@ -89,6 +92,10 @@
                     return getType();
                 }
                 return -1;
+            },
+            select (block) {
+                block.selected = !block.selected;
+                window.console.log(block);
             }
         }
     };
