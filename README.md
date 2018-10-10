@@ -1,6 +1,6 @@
-# blog
+# games
 
-> A Vue.js project
+> A Vue.js project of games
 
 ## Build Setup
 
