@@ -1,6 +1,6 @@
 <template>
     <div class="index-content">
-        <block v-for="n in 400" :key="n" ref="blocks"
+        <block v-for="n in 400" :key="n" :index="n-1" ref="blocks"
                :is-show="map[n-1]"
                :type="showType(map[n-1])"
                @select="select"></block>
@@ -75,11 +75,11 @@
                 let i = 0;
                 this.coordinate = {};
                 this.$refs.blocks.forEach((item, key) => {
-                    this.coordinate[i] = this.coordinate[i] || [];
-                    this.coordinate[i].push(item);
-                    if (key % col === 0) {
+                    if (key % col === 0 && key !== 0) {
                         i++;
                     }
+                    this.coordinate[i] = this.coordinate[i] || [];
+                    this.coordinate[i].push(item);
                 });
             },
             /**
@@ -94,8 +94,85 @@
                 return -1;
             },
             select (block) {
-                block.selected = !block.selected;
-                window.console.log(block);
+
+                // 不是点击同一个方块，要判断能不能消除
+                if (this.block !== block && this.block) {
+                    if (this.canDestroy(this.block, block)) {
+                        this.destroyBlock(this.block, block);
+                        this.block = null;
+                        if (this.checkAllDestroy()) {
+                            this.gameOver();
+                        }
+                    } else {
+                        block.select();
+                        this.block.deselect();
+                        this.block = block;
+                    }
+                } else {
+                    block.toggleSelect();
+                    this.block = block;
+                }
+            },
+            /**
+             * 判断两个方块是否能消除
+             * @param block1
+             * @param block2
+             * @returns {boolean}
+             */
+            canDestroy (block1, block2) {
+                if (block1.type === block2.type) {
+                    const [block1X, block1Y] = this.getXY(block1);
+                    const [block2X, block2Y] = this.getXY(block2);
+
+                    // 如x轴或y轴相等，两点连线无遮挡则消除
+                    if (block1X === block2X) {
+                        let minY = (block1Y > block2Y ? block2Y : block1Y) + 1;
+                        const maxY = (block1Y > block2Y ? block1Y : block2Y) - 1;
+                        for (; minY <= maxY; minY++) {
+                            if (this.coordinate[minY][block1X].isExist()) {
+                                return false;
+                            }
+                        }
+                    }
+                    if (block1Y === block2Y) {
+                        let minX = (block1X > block2X ? block2X : block1X) + 1;
+                        const maxX = (block1X > block2X ? block1X : block2X) - 1;
+                        for (; minX <= maxX; minX++) {
+                            if (this.coordinate[block1Y][minX].isExist()) {
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            },
+            /**
+             * 消除两个方块
+             * @param block1
+             * @param block2
+             */
+            destroyBlock (block1, block2) {
+                block1.hide();
+                block2.hide();
+            },
+            /**
+             * 检查是否全部消除完毕
+             * @returns {boolean}
+             */
+            checkAllDestroy () {
+                return !this.$refs.blocks.find(item => item.isExist());
+            },
+            gameOver () {
+
+            },
+            /**
+             * 获取方块的xy坐标
+             * @param block
+             * @returns {number[]}
+             */
+            getXY (block) {
+                return [block.index % col, parseInt(block.index / col, 10)];
             }
         }
     };

@@ -49,17 +49,17 @@
                 isLogin: false
             };
         },
-        async beforeCreate () {
-            const response = await this.Axios.post('init');
-            if (response) {
-                this.$store.dispatch({
-                    type: 'updateLoginInfo',
-                    userName: response.userName,
-                    isLogin: response.isLogin
-                });
-                this.isLogin = response.isLogin;
-            }
-        },
+        // async beforeCreate () {
+        //     const response = await this.Axios.post('init');
+        //     if (response) {
+        //         this.$store.dispatch({
+        //             type: 'updateLoginInfo',
+        //             userName: response.userName,
+        //             isLogin: response.isLogin
+        //         });
+        //         this.isLogin = response.isLogin;
+        //     }
+        // },
         methods: {
             setActiveTab () {
                 this.setNav(this.$route.path);

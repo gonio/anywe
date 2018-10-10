@@ -18,21 +18,46 @@
             type: {
                 type: Number,
                 default: 0
+            },
+            index: {
+                type: Number,
+                default: 0
             }
         },
         data () {
             return {
-                selected: false
+                selected: false,
+                isShown: this.isShow === 1
             };
         },
         methods: {
             onSelect () {
-                this.$emit('select', this);
+                if (this.isShow === 1) {
+                    this.$emit('select', this);
+                }
+            },
+            select () {
+                this.selected = true;
+            },
+            deselect () {
+                this.selected = false;
+            },
+            toggleSelect () {
+                this.selected = !this.selected;
+            },
+            hide () {
+                this.isShown = false;
+            },
+            show () {
+                this.isShown = true;
+            },
+            isExist () {
+                return this.isShown;
             }
         },
         computed: {
             showClass () {
-                let finalClass = this.isShow === 1 ? 'is-show' : 'is-hide';
+                let finalClass = this.isShown ? 'is-show' : 'is-hide';
                 finalClass += this.selected ? ' is-selected' : '';
                 return finalClass;
             },
