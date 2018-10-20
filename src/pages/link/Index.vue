@@ -133,8 +133,8 @@
                         const minX = block11.x > block21.x ? block11.x : block21.x;
                         const maxX = block12.x < block22.x ? block12.x : block22.x;
                         for (let i = minX + 1; i < maxX; i++) {
-                            if (this.checkExistOneYLine(this.coordinate[block1Y][i], this.coordinate[block2Y][i])) {
-                                return false;
+                            if (!this.checkExistYLine(this.coordinate[block1Y][i], this.coordinate[block2Y][i])) {
+                                return true;
                             }
                         }
                     }
@@ -148,15 +148,44 @@
                         const minY = block11.y > block21.y ? block11.y : block21.y;
                         const maxY = block12.y < block22.y ? block12.y : block22.y;
                         for (let i = minY + 1; i < maxY; i++) {
-                            if (this.checkExistOneXLine(this.coordinate[i][block1X], this.coordinate[i][block2X])) {
-                                return false;
+                            if (!this.checkExistXLine(this.coordinate[i][block1X], this.coordinate[i][block2X])) {
+                                return true;
                             }
                         }
-                        window.console.log(minY, maxY);
                     }
 
                     // 如x轴和y轴都不等
-                    return true;
+                    if (block1Y !== block2Y && block1X !== block2X) {
+
+                        // 找出两个方块形成的矩形交集内是否可消除
+                        // 找出位置靠上、靠下的方块
+                        const [topYBlock, bottomYBlock] = block1.y < block2.y ? [block1, block2] : [block2, block1];
+                        const [topYBlock1, topYBlock2] = this.getBlockYRange(topYBlock);
+                        const [bottomYBlock1, bottomYBlock2] = this.getBlockYRange(bottomYBlock);
+                        if (topYBlock2.y > bottomYBlock1.y) {
+                            const intersectionTopY = topYBlock1.y > bottomYBlock1.y ? topYBlock1.y : bottomYBlock1.y;
+                            const intersectionBottomY = bottomYBlock2.y < topYBlock2.y ? bottomYBlock2.y : topYBlock2.y;
+                            for (let i = intersectionTopY + 1; i < intersectionBottomY; i++) {
+                                if (!this.checkExistXLine(this.coordinate[i][block1X], this.coordinate[i][block2X])) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        // 找出位置靠左、靠右的方块
+                        const [leftXBlock, rightXBlock] = block1.x < block2.x ? [block1, block2] : [block2, block1];
+                        const [leftXBlock1, leftXBlock2] = this.getBlockXRange(leftXBlock);
+                        const [rightXBlock1, rightXBlock2] = this.getBlockXRange(rightXBlock);
+                        if (leftXBlock2.x > rightXBlock1.x) {
+                            const intersectionLeftX = leftXBlock1.x > rightXBlock1.x ? leftXBlock1.x : rightXBlock1.x;
+                            const intersectionRightX = leftXBlock2.x < rightXBlock2.x ? leftXBlock2.x : rightXBlock2.x;
+                            for (let i = intersectionLeftX + 1; i < intersectionRightX; i++) {
+                                if (!this.checkExistYLine(this.coordinate[block1Y][i], this.coordinate[block2Y][i])) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
                 }
                 return false;
             },
@@ -185,7 +214,7 @@
              * @param block2
              * @returns {boolean}
              */
-            checkExistOneYLine (block1, block2) {
+            checkExistYLine (block1, block2) {
                 const [block1X, block1Y] = [block1.x, block1.y];
                 const block2Y = block2.y;
                 let minY = (block1Y > block2Y ? block2Y : block1Y) + 1;
@@ -204,7 +233,7 @@
              * @param block2
              * @returns {boolean}
              */
-            checkExistOneXLine (block1, block2) {
+            checkExistXLine (block1, block2) {
                 const [block1X, block1Y] = [block1.x, block1.y];
                 const block2X = block2.x;
                 let minX = (block1X > block2X ? block2X : block1X) + 1;

@@ -60,6 +60,8 @@ module.exports = {
         'no-plusplus': 0,
         'consistent-return': 0,
         'no-shadow': 0,
+        'one-var-declaration-per-line': 0,
+        'one-var': 0,
         'no-new': 0
     }
 };
