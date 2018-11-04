@@ -9,7 +9,15 @@ const TYPE_MAP = {
     6: 'glyphicon glyphicon-tint',
     7: 'glyphicon glyphicon-eye-open',
     8: 'glyphicon glyphicon-fire',
-    9: 'glyphicon glyphicon-heart-empty'
+    9: 'glyphicon glyphicon-heart-empty',
+};
+
+// 方块的状态css类名
+const STATUS_CLASS_MAP = {
+    show: 'is-show',                    // 显示
+    hide: 'is-hide',                    // 隐藏
+    selected: 'is-show is-selected',    // 选择
+    destroy: 'is-hide is-destroying',   // 销毁
 };
 
 // 图形，0代表没有格子，1代表有格子
@@ -47,11 +55,12 @@ const type = {
     6: 22,
     7: 22,
     8: 22,
-    9: 22
+    9: 22,
 };
 
 export {
     map1,
     type,
-    TYPE_MAP
+    TYPE_MAP,
+    STATUS_CLASS_MAP,
 };

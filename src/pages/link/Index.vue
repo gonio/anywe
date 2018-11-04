@@ -124,65 +124,37 @@
                     const [block1X, block1Y] = [block1.x, block1.y];
                     const [block2X, block2Y] = [block2.x, block2.y];
 
-                    // 如x轴相等
-                    if (block1X === block2X) {
-                        const [block11, block12] = this.getBlockXRange(block1);
-                        const [block21, block22] = this.getBlockXRange(block2);
-
-                        // 找出最小可消除X轴范围
-                        const minX = block11.x > block21.x ? block11.x : block21.x;
-                        const maxX = block12.x < block22.x ? block12.x : block22.x;
-                        for (let i = minX + 1; i < maxX; i++) {
-                            if (!this.checkExistYLine(this.coordinate[block1Y][i], this.coordinate[block2Y][i])) {
-                                return true;
-                            }
-                        }
+                    // 如果两方块靠在一起则直接返回true
+                    if ((Math.abs(block1X - block2X) === 1 && block1Y === block2Y) ||
+                        (Math.abs(block1Y - block2Y) === 1 && block1X === block2X)) {
+                        return true;
                     }
 
-                    // 如y轴相等
-                    if (block1Y === block2Y) {
-                        const [block11, block12] = this.getBlockYRange(block1);
-                        const [block21, block22] = this.getBlockYRange(block2);
-
-                        // 找出最小可消除Y轴范围
-                        const minY = block11.y > block21.y ? block11.y : block21.y;
-                        const maxY = block12.y < block22.y ? block12.y : block22.y;
-                        for (let i = minY + 1; i < maxY; i++) {
+                    // 找出两个方块形成的矩形交集内是否可消除
+                    // 找出位置靠上、靠下的方块
+                    const [topYBlock, bottomYBlock] = this.getSortYBlocks(block1, block2);
+                    const [topYBlock1, topYBlock2] = this.getBlockYRange(topYBlock);
+                    const [bottomYBlock1, bottomYBlock2] = this.getBlockYRange(bottomYBlock);
+                    if (topYBlock2.y > bottomYBlock1.y) {
+                        const intersectionTopY = Math.max(topYBlock1.y, bottomYBlock1.y);
+                        const intersectionBottomY = Math.min(topYBlock2.y, bottomYBlock2.y);
+                        for (let i = intersectionTopY + 1; i < intersectionBottomY; i++) {
                             if (!this.checkExistXLine(this.coordinate[i][block1X], this.coordinate[i][block2X])) {
                                 return true;
                             }
                         }
                     }
 
-                    // 如x轴和y轴都不等
-                    if (block1Y !== block2Y && block1X !== block2X) {
-
-                        // 找出两个方块形成的矩形交集内是否可消除
-                        // 找出位置靠上、靠下的方块
-                        const [topYBlock, bottomYBlock] = block1.y < block2.y ? [block1, block2] : [block2, block1];
-                        const [topYBlock1, topYBlock2] = this.getBlockYRange(topYBlock);
-                        const [bottomYBlock1, bottomYBlock2] = this.getBlockYRange(bottomYBlock);
-                        if (topYBlock2.y > bottomYBlock1.y) {
-                            const intersectionTopY = topYBlock1.y > bottomYBlock1.y ? topYBlock1.y : bottomYBlock1.y;
-                            const intersectionBottomY = bottomYBlock2.y < topYBlock2.y ? bottomYBlock2.y : topYBlock2.y;
-                            for (let i = intersectionTopY + 1; i < intersectionBottomY; i++) {
-                                if (!this.checkExistXLine(this.coordinate[i][block1X], this.coordinate[i][block2X])) {
-                                    return true;
-                                }
-                            }
-                        }
-
-                        // 找出位置靠左、靠右的方块
-                        const [leftXBlock, rightXBlock] = block1.x < block2.x ? [block1, block2] : [block2, block1];
-                        const [leftXBlock1, leftXBlock2] = this.getBlockXRange(leftXBlock);
-                        const [rightXBlock1, rightXBlock2] = this.getBlockXRange(rightXBlock);
-                        if (leftXBlock2.x > rightXBlock1.x) {
-                            const intersectionLeftX = leftXBlock1.x > rightXBlock1.x ? leftXBlock1.x : rightXBlock1.x;
-                            const intersectionRightX = leftXBlock2.x < rightXBlock2.x ? leftXBlock2.x : rightXBlock2.x;
-                            for (let i = intersectionLeftX + 1; i < intersectionRightX; i++) {
-                                if (!this.checkExistYLine(this.coordinate[block1Y][i], this.coordinate[block2Y][i])) {
-                                    return true;
-                                }
+                    // 找出位置靠左、靠右的方块
+                    const [leftXBlock, rightXBlock] = this.getSortXBlocks(block1, block2);
+                    const [leftXBlock1, leftXBlock2] = this.getBlockXRange(leftXBlock);
+                    const [rightXBlock1, rightXBlock2] = this.getBlockXRange(rightXBlock);
+                    if (leftXBlock2.x > rightXBlock1.x) {
+                        const intersectionLeftX = Math.max(leftXBlock1.x, rightXBlock1.x);
+                        const intersectionRightX = Math.min(leftXBlock2.x, rightXBlock2.x);
+                        for (let i = intersectionLeftX + 1; i < intersectionRightX; i++) {
+                            if (!this.checkExistYLine(this.coordinate[block1Y][i], this.coordinate[block2Y][i])) {
+                                return true;
                             }
                         }
                     }
@@ -205,9 +177,6 @@
             checkAllDestroy () {
                 return !this.$refs.blocks.find(item => item.isExist());
             },
-            gameOver () {
-
-            },
             /**
              * 检查Y轴方向（竖线）两方块之间是否有遮挡
              * @param block1
@@ -224,7 +193,6 @@
                         return true;
                     }
                 }
-                window.console.log(minY, maxY);
                 return false;
             },
             /**
@@ -243,7 +211,6 @@
                         return true;
                     }
                 }
-                window.console.log(minX, maxX);
                 return false;
             },
             /**
@@ -315,7 +282,31 @@
                 }
 
                 return [block1, block2];
-            }
+            },
+            /**
+             * 获取按照X轴从小到大排序的方块
+             * @param block1
+             * @param block2
+             * @returns {*[]}
+             */
+            getSortXBlocks (block1, block2) {
+                return block1.x < block2.x ? [block1, block2] : [block2, block1];
+            },
+            /**
+             * 获取按照Y轴从小到大排序的方块
+             * @param block1
+             * @param block2
+             * @returns {*[]}
+             */
+            getSortYBlocks (block1, block2) {
+                return block1.y < block2.y ? [block1, block2] : [block2, block1];
+            },
+            /**
+             * 游戏结束gg
+             */
+            gameOver () {
+
+            },
         }
     };
 </script>

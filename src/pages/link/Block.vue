@@ -6,7 +6,7 @@
 
 <script>
 
-    import { TYPE_MAP } from './Map';
+    import { TYPE_MAP, STATUS_CLASS_MAP } from './Map';
 
     export default {
         name: 'Block',
@@ -35,39 +35,55 @@
         data () {
             return {
                 selected: false,
-                isShown: this.isShow === 1
+                isShown: this.isShow === 1,
+                status: this.isShow === 1 ? 'show' : 'hide',
             };
         },
         methods: {
             onSelect () {
-                if (this.isShow === 1) {
+                if (this.isShown) {
                     this.$emit('select', this);
                 }
             },
             select () {
-                this.selected = true;
+                this.status = 'selected';
             },
             deselect () {
-                this.selected = false;
+                this.status = 'show';
             },
             toggleSelect () {
-                this.selected = !this.selected;
+                this.status = this.status === 'selected' ? 'show' : 'selected';
             },
             hide () {
+                this.status = 'hide';
                 this.isShown = false;
             },
             show () {
+                this.status = 'show';
                 this.isShown = true;
             },
             isExist () {
+                return this.isShown;
+            },
+            destroy () {
+                this.status = 'destroy';
                 return this.isShown;
             }
         },
         computed: {
             showClass () {
-                let finalClass = this.isShown ? 'is-show' : 'is-hide';
-                finalClass += this.selected ? ' is-selected' : '';
-                return finalClass;
+                switch (this.status) {
+                    case 'show':
+                        return STATUS_CLASS_MAP.show;
+                    case 'hide':
+                        return STATUS_CLASS_MAP.hide;
+                    case 'selected':
+                        return STATUS_CLASS_MAP.selected;
+                    case 'destroy':
+                        return STATUS_CLASS_MAP.destroy;
+                    default:
+                        return STATUS_CLASS_MAP.show;
+                }
             },
             showType () {
                 return TYPE_MAP[this.type];
@@ -77,19 +93,41 @@
 </script>
 
 <style lang="less" scoped>
-    .block-item {
-        border: 1px #424242 solid;
+    .normal-i() {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        font-size: 30px;
+        line-height: 40px;
+    }
+
+    .normal-block-item() {
         margin: 1px;
         flex: 0 0 40px;
         height: 40px;
+    }
+
+    .block-item {
+        .normal-block-item();
+        border: 1px #424242 solid;
         box-shadow: 3px 3px 3px 3px #ccc;
         i {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            font-size: 30px;
-            line-height: 40px;
+            .normal-i()
         }
+    }
+
+    /*横线*/
+    .block-x-line {
+        .normal-block-item();
+        border: 1px transparent solid;
+        border-top: 1px solid black;
+    }
+
+    /*竖线*/
+    .block-y-line {
+        .normal-block-item();
+        border: 1px transparent solid;
+        border-left: 1px solid black;
     }
 
     .is-show {
