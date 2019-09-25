@@ -14,10 +14,10 @@ const TYPE_MAP = {
 
 // 方块的状态css类名
 const STATUS_CLASS_MAP = {
-    show: 'is-show',                    // 显示
-    hide: 'is-hide',                    // 隐藏
-    selected: 'is-show is-selected',    // 选择
-    destroy: 'is-hide is-destroying',   // 销毁
+    show: 'is-show', // 显示
+    hide: 'is-hide', // 隐藏
+    selected: 'is-show is-selected', // 选择
+    destroy: 'is-hide is-destroying', // 销毁
 };
 
 // 图形，0代表没有格子，1代表有格子

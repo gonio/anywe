@@ -6,7 +6,7 @@ import logger from './logger';
  */
 
 export default {
-    install
+    install,
 };
 
 function install (Vue) {
@@ -14,13 +14,13 @@ function install (Vue) {
     // Axios.defaults.baseURL = '/hyz';
     Axios.interceptors.response.use(({ data }) => {
         if (!data.success) {
-            Vue.toast(data.msg || '与服务器通讯失败！');
+            Vue.prototype.$alert(data.msg || '与服务器通讯失败！');
             return null;
         }
-        return data.data;
+        return data.data || true;
     }, (error) => {
         logger.error(error);
-        Vue.toast('与服务器通讯失败！');
+        Vue.prototype.$alert('与服务器通讯失败！');
         return Promise.resolve(null);
     });
 
@@ -29,7 +29,7 @@ function install (Vue) {
         Axios: {
             get () {
                 return Axios;
-            }
-        }
+            },
+        },
     });
 }

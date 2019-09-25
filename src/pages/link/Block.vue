@@ -13,26 +13,26 @@
         props: {
             isShow: {
                 type: Number,
-                default: 1
+                default: 1,
             },
             type: {
                 type: Number,
-                default: 0
+                default: 0,
             },
             index: {
                 type: Number,
-                default: 0
+                default: 0,
             },
             x: {
                 type: Number,
-                default: 0
+                default: 0,
             },
             y: {
                 type: Number,
-                default: 0
-            }
+                default: 0,
+            },
         },
-        data () {
+        data() {
             return {
                 selected: false,
                 isShown: this.isShow === 1,
@@ -40,38 +40,38 @@
             };
         },
         methods: {
-            onSelect () {
+            onSelect() {
                 if (this.isShown) {
                     this.$emit('select', this);
                 }
             },
-            select () {
+            select() {
                 this.status = 'selected';
             },
-            deselect () {
+            deselect() {
                 this.status = 'show';
             },
-            toggleSelect () {
+            toggleSelect() {
                 this.status = this.status === 'selected' ? 'show' : 'selected';
             },
-            hide () {
+            hide() {
                 this.status = 'hide';
                 this.isShown = false;
             },
-            show () {
+            show() {
                 this.status = 'show';
                 this.isShown = true;
             },
-            isExist () {
+            isExist() {
                 return this.isShown;
             },
-            destroy () {
+            destroy() {
                 this.status = 'destroy';
                 return this.isShown;
-            }
+            },
         },
         computed: {
-            showClass () {
+            showClass() {
                 switch (this.status) {
                     case 'show':
                         return STATUS_CLASS_MAP.show;
@@ -85,10 +85,10 @@
                         return STATUS_CLASS_MAP.show;
                 }
             },
-            showType () {
+            showType() {
                 return TYPE_MAP[this.type];
-            }
-        }
+            },
+        },
     };
 </script>
 

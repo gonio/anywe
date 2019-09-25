@@ -4,7 +4,7 @@
  * @returns {Function}      返回实际接口
  * @private
  */
-function _logger (type) {
+function _logger(type) {
     return (...args) => {
         if (process.env.NODE_ENV === 'development' && window.console) {
             if (window.console[type]) {

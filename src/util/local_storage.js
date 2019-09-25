@@ -2,28 +2,28 @@
  * localStorage的封装
  */
 
-function getStorage (...args) {
+function getStorage(...args) {
     return localStorage.getItem(...args);
 }
 
-function setStorage (...args) {
+function setStorage(...args) {
     return localStorage.setItem(...args);
 }
 
 
-function removeStorage (...args) {
+function removeStorage(...args) {
     return localStorage.removeItem(...args);
 }
 
-function clear (...args) {
+function clear(...args) {
     return localStorage.clear(...args);
 }
 
-function getLength () {
+function getLength() {
     return localStorage.length;
 }
 
-function getKey (...args) {
+function getKey(...args) {
     return localStorage.key(args);
 }
 
@@ -34,5 +34,5 @@ export {
     clear,
 
     getKey,
-    getLength
+    getLength,
 };

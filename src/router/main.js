@@ -1,8 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Index from '../pages/link/Index';
-import Login from '../components/Login';
-import Main from '../components/Main';
+import Login from '../components/login';
 
 Vue.use(Router);
 
@@ -22,7 +21,7 @@ export default new Router({
     }, {
         path: '/qa',
         name: 'qa',
-        component: Login,
+        component: Test,
     }, {
         path: '/alarm',
         name: 'alarm',
@@ -31,5 +30,5 @@ export default new Router({
         path: '/class',
         name: 'class',
         component: Login,
-    }]
+    }],
 });

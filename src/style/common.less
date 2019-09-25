@@ -1,16 +1,19 @@
-body {
+body, html {
     font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "WenQuanYi Micro Hei", "Microsoft Yahei", sans-serif;
     font-size: 14px;
     line-height: 1.42858;
     color: #333;
     background-color: #fff;
     -webkit-font-smoothing: antialiased;
+    width: 100%;
+    height: 100%;
 }
 
 a, .a-link {
     color: #009a61;
     text-decoration: none;
     cursor: pointer;
+
     &:hover {
         color: #004e31;
         text-decoration: underline;
@@ -28,6 +31,7 @@ label {
     color: #fff;
     background-color: #009a61;
     border-color: #008151;
+
     &:hover, &:not(:disabled):not(.disabled):active {
         background-color: #006741;
         border-color: #00432a;
@@ -38,6 +42,7 @@ label {
     color: #333;
     background-color: #fff;
     border-color: #ccc;
+
     &:hover, &:not(:disabled):not(.disabled):active {
         background-color: #e6e6e6;
         border-color: #adadad;
@@ -72,10 +77,6 @@ label {
     transform: translateX(-50%);
 }
 
-.v--modal-overlay .v--modal-box {
-    padding: 15px;
-}
-
 // 创建padding
 .loopPadding(@i, @j, @name, @align) when (@i <= @j) { //效果看css
     @count: @i*5;
@@ -89,3 +90,19 @@ label {
 .loopPadding(0, 50, 'r', 'right');
 .loopPadding(0, 30, 't', 'top');
 .loopPadding(0, 30, 'b', 'bottom');
+
+.w100p {
+    width: 100%;
+}
+
+.h100p {
+    height: 100%;
+}
+
+.rf {
+    float: right;
+}
+
+.lf {
+    float: left;
+}

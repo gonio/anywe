@@ -2,20 +2,18 @@
 // shape: [{ id, quantity }]
 const state = {
     userName: '',
-    isLogin: false
+    userID: 1,
+    isLogin: false,
 };
 
 // getters
-const getters = {
-    userName: state => state.userName,
-    isLogin: state => state.isLogin,
-};
+const getters = {};
 
 // actions
 const actions = {
     updateLoginInfo ({ commit }, info) {
         commit('setLoginInfo', info);
-    }
+    },
 };
 
 // mutations
@@ -28,12 +26,12 @@ const mutations = {
      */
     setLoginInfo (state, info) {
         Object.assign(state, info);
-    }
+    },
 };
 
 export default {
     state,
     getters,
     actions,
-    mutations
+    mutations,
 };

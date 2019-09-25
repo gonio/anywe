@@ -1,17 +1,39 @@
 <template>
-    <div class="index-content">
-        <block v-for="n in 400" :key="n" :index="n-1" ref="blocks"
-               :is-show="map[n-1]"
-               :type="showType(map[n-1])"
-               :x="(n-1) % col"
-               :y="parseInt((n-1) / col, 10)"
-               @select="select"></block>
+    <div>
+        <div v-show="status === statusMap.init">
+            <el-button @click="createGame">创建游戏</el-button>
+            <el-button @click="joinGame">加入游戏</el-button>
+        </div>
+        <div v-show="status === statusMap.create">
+            <div>显示所有玩家形象</div>
+            <div>等待玩家准备</div>
+            <el-button @click="onclickReady">准备</el-button>
+            <el-button @click="onclickQuit">退出</el-button>
+        </div>
+        <div v-show="status === statusMap.join">
+            <div>显示所有玩家形象</div>
+            <div>等待玩家准备</div>
+            <el-button @click="onclickReady">准备</el-button>
+            <el-button @click="onclickQuit">退出</el-button>
+        </div>
+        <div class="index-content" v-show="status === statusMap.start">
+            <block v-for="n in 400" :key="n" :index="n-1" ref="blocks"
+                   :is-show="map[n-1]"
+                   :type="showType(map[n-1])"
+                   :x="(n-1) % col"
+                   :y="parseInt((n-1) / col, 10)"
+                   @select="select"></block>
+        </div>
+        <div v-show="status === statusMap.over">
+            <div>游戏结束</div>
+        </div>
     </div>
 </template>
 
 <script>
 
     import { getRandom } from '../../util/util';
+    import { Communicate } from './communicate';
     import Block from './Block';
     import { map1, type } from './Map';
 
@@ -54,15 +76,25 @@
         return -1;
     }
 
+    const STATUS_MAP = {
+        init: 1,
+        create: 2,
+        join: 3,
+        start: 4,
+        over: 5,
+    };
+
     export default {
         data () {
             return {
                 map: map1,
-                col: 20 // 列、排方块的数量
+                col: 20, // 列、排方块的数量
+                statusMap: STATUS_MAP,
+                status: STATUS_MAP.init, // STATUS_MAP
             };
         },
         components: {
-            Block
+            Block,
         },
         mounted () {
             this.initCoordinate();
@@ -73,13 +105,18 @@
              */
             initCoordinate () {
                 let i = 0;
-                this.coordinate = {};
+                this.coordinate = {}; // block数组对象，前端自用
+                this.blockShowMap = {}; // block的isShown数组对象，用于和服务端同步
+
                 this.$refs.blocks.forEach((item, key) => {
                     if (key % this.col === 0 && key !== 0) {
                         i++;
                     }
                     this.coordinate[i] = this.coordinate[i] || [];
                     this.coordinate[i].push(item);
+
+                    this.blockShowMap[i] = this.blockShowMap[i] || [];
+                    this.blockShowMap[i].push({ isShown: item.isShown });
                 });
             },
             /**
@@ -94,7 +131,6 @@
                 return -1;
             },
             select (block) {
-
                 // 不是点击同一个方块，要判断能不能消除
                 if (this.block !== block && this.block) {
                     if (this.canDestroy(this.block, block)) {
@@ -125,8 +161,8 @@
                     const [block2X, block2Y] = [block2.x, block2.y];
 
                     // 如果两方块靠在一起则直接返回true
-                    if ((Math.abs(block1X - block2X) === 1 && block1Y === block2Y) ||
-                        (Math.abs(block1Y - block2Y) === 1 && block1X === block2X)) {
+                    if ((Math.abs(block1X - block2X) === 1 && block1Y === block2Y)
+                        || (Math.abs(block1Y - block2Y) === 1 && block1X === block2X)) {
                         return true;
                     }
 
@@ -169,13 +205,16 @@
             destroyBlock (block1, block2) {
                 block1.hide();
                 block2.hide();
+                this.blockShowMap[block1.y][block1.x] = { isShown: false };
+                this.blockShowMap[block2.y][block2.x] = { isShown: false };
+                this.server.send({});
             },
             /**
              * 检查是否全部消除完毕
              * @returns {boolean}
              */
             checkAllDestroy () {
-                return !this.$refs.blocks.find(item => item.isExist());
+                return !this.$refs.blocks.find((item) => item.isExist());
             },
             /**
              * 检查Y轴方向（竖线）两方块之间是否有遮挡
@@ -220,7 +259,9 @@
              */
             getBlockXRange (block) {
                 const [blockX, blockY] = [block.x, block.y];
-                let block1 = this.coordinate[blockY][0], block2 = this.coordinate[blockY][this.col - 1];
+                let block1 = this.coordinate[blockY][0];
+                let
+                    block2 = this.coordinate[blockY][this.col - 1];
 
                 // 左边边界方块
                 if (blockX === 0) {
@@ -255,7 +296,9 @@
              */
             getBlockYRange (block) {
                 const [blockX, blockY] = [block.x, block.y];
-                let block1 = this.coordinate[0][blockX], block2 = this.coordinate[this.col - 1][blockX];
+                let block1 = this.coordinate[0][blockX];
+                let
+                    block2 = this.coordinate[this.col - 1][blockX];
 
                 // 上边边界方块
                 if (blockY === 0) {
@@ -305,9 +348,33 @@
              * 游戏结束gg
              */
             gameOver () {
-
+                this.status = STATUS_MAP.over;
+                this.server.send({ isOver: true });
             },
-        }
+            createGame () {
+                this.status = STATUS_MAP.create;
+                this.server = new Communicate({
+                    isRoomOwner: true,
+                    store: this.$store
+                });
+            },
+            joinGame () {
+                this.status = STATUS_MAP.join;
+                this.server = new Communicate({
+                    isRoomOwner: false,
+                    store: this.$store
+                });
+            },
+            startGame () {
+                this.status = STATUS_MAP.start;
+            },
+            onclickReady () {
+                this.server.send({
+                    userID: this.$store.getters.userID,
+                    opr: 'ready'
+                });
+            },
+        },
     };
 </script>
 
