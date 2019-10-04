@@ -2,48 +2,81 @@
  * 和服务端通信模块
  */
 
-const SEND_TYPE = {
-    create: 0, // 创建房间
-    join: 1, // 加入房间
-};
-
 export class Communicate {
-    constructor({ isRoomOwner, store }) {
-        this.init({ isRoomOwner, store });
+    constructor ({ data, vm }) {
+        this.init({
+            data,
+            vm
+        });
     }
 
     /**
      * 初始化
-     * @param isRoomOwner
-     * @param store
+     * @param {object} isRoomOwner
+     * @param {object} vm
      */
-    init({ isRoomOwner, store }) {
-        this.isRoomOwner = isRoomOwner;
-        this.store = store;
-        this.ws = new WebSocket('ws://localhost:3000/ws/link');
+    init ({ data, vm }) {
+        this.ws = new WebSocket(`ws://${window.location.hostname}:3000/ws/link`);
         const { ws } = this;
 
+        this.isRoomOwner = data.isRoomOwner;
+        this.roomID = data.roomID;
+
         ws.onopen = function () {
-            // Web Socket 已连接上，使用 send() 方法发送数据
-            ws.send(JSON.stringify({
-                isRoomOwner,
-                type: isRoomOwner ? SEND_TYPE.create : SEND_TYPE.join,
-            }));
+            ws.send(JSON.stringify(data));
         };
 
         ws.onmessage = function (evt) {
-            window.console.log(evt);
+            let data = {};
+            try {
+                data = JSON.parse(evt.data);
+            } catch (e) {
 
-            store.dispatch(evt.data);
+                // nothing
+            }
+            if (!data.success) {
+                vm.$alert(data.msg || '与服务器通讯失败！');
+                return null;
+            }
+            data = data.data;
+            switch (data.type) {
+                case 'start':
+                    vm.startGame();
+                    break;
+
+                case 'update':
+                    vm.$store.dispatch('link/updatePlayersInfo', data.players);
+                    break;
+
+                case 'gameOver':
+                    vm.gameOver();
+                    break;
+
+                case 'win':
+                    vm.win();
+                    break;
+
+                case 'quit':
+                    vm.onclickQuit();
+                    break;
+
+                default:
+                    vm.$store.dispatch('link/updatePlayersInfo', data.players);
+                    vm.$store.dispatch('link/updateRoomInfo', data.info);
+                    break;
+            }
         };
 
         ws.onclose = function () {
-            // 关闭 websocket
             window.console.log('连接已关闭...');
         };
     }
 
-    send(data) {
+    send (data) {
         this.ws.send(JSON.stringify(data));
+    }
+
+    close () {
+        this.ws.close();
     }
 }

@@ -2,13 +2,13 @@
 
 import { deepCopy } from '../../util/util';
 
-export default function createLogger(
+export default function createLogger (
     {
         collapsed = true,
         filter = () => true,
         transformer = (state) => state,
         mutationTransformer = (mut) => mut,
-        logger = console,
+        logger = console
     } = {},
 ) {
     return (store) => {
@@ -25,9 +25,9 @@ export default function createLogger(
                 const formattedTime = ` @ ${pad(time.getHours(), 2)}:${pad(time.getMinutes(), 2)}:${pad(time.getSeconds(), 2)}.${pad(time.getMilliseconds(), 3)}`;
                 const formattedMutation = mutationTransformer(mutation);
                 const message = `mutation ${mutation.type}${formattedTime}`;
-                const startMessage = collapsed
-                    ? logger.groupCollapsed
-                    : logger.group;
+                const startMessage = collapsed ?
+                    logger.groupCollapsed :
+                    logger.group;
 
                 // render
                 try {
@@ -52,10 +52,10 @@ export default function createLogger(
     };
 }
 
-function repeat(str, times) {
+function repeat (str, times) {
     return (new Array(times + 1)).join(str);
 }
 
-function pad(num, maxLength) {
+function pad (num, maxLength) {
     return repeat('0', maxLength - num.toString().length) + num;
 }

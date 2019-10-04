@@ -1,5 +1,7 @@
 /**
  * 验证表单规则
+ * @param {string} msg
+ * @returns {{trigger: string, message: (*|string), required: boolean}}
  */
 export function require (msg) {
     return {
@@ -20,8 +22,8 @@ export function email (msg) {
 export function emailOrPhone (msg) {
     return {
         validator: (rule, value, callback) => {
-            if (!/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/.test(value)
-                || /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/.test(value)) {
+            if (!/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/.test(value) ||
+                /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/.test(value)) {
                 callback(new Error(msg || '请输入邮箱或者手机号'));
             } else {
                 callback();

@@ -1,90 +1,108 @@
 <template>
     <div id="app">
-        <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+        <el-menu :default-active="activeIndex"
+                 class="el-menu-demo"
+                 mode="horizontal">
             <el-menu-item index="1">
-                <router-link :to="'/'">连连看</router-link>
+                <router-link :to="'/'">
+                    连连看
+                </router-link>
             </el-menu-item>
             <el-button v-if="!isLogin"
-                       @click="onClickLogin">立即登录
+                       @click="onClickLogin">
+                立即登录
             </el-button>
             <el-button v-if="!isLogin"
-                       @click="onClickSignUp">免费注册
+                       @click="onClickSignUp">
+                免费注册
             </el-button>
-            <div v-if="isLogin">{{name}}</div>
+            <div v-if="isLogin">
+                {{ name }}
+            </div>
         </el-menu>
-        <el-dialog :visible.sync="dialogVisible">
+        <el-dialog :visible.sync="dialogVisible"
+                   :close-on-click-modal="false">
             <div v-if="!isLogin">
-                <login v-show="dialogType === TYPE_MAP.login" name="loginModal"/>
-                <login v-show="dialogType === TYPE_MAP.sign" name="signUpModal"/>
+                <login v-show="dialogType === TYPE_MAP.login"
+                       name="loginModal" />
+                <login v-show="dialogType === TYPE_MAP.sign"
+                       name="signUpModal" />
             </div>
         </el-dialog>
-        <router-view/>
+        <router-view class="content" />
     </div>
 </template>
 
 <script>
-    import Login from '../components/login';
+import Login from '../components/login';
 
-    const TYPE_MAP = {
-        login: 1,
-        sign: 2
-    };
+const TYPE_MAP = {
+    login: 1,
+    sign: 2
+};
 
-    export default {
-        name: 'App',
-        data () {
-            return {
-                activeIndex: 1,
-                TYPE_MAP,
-                dialogVisible: false,
-                dialogType: TYPE_MAP.login,
-            };
+export default {
+    name: 'App',
+    components: {
+        Login
+    },
+    data () {
+        return {
+            activeIndex: '1',
+            TYPE_MAP,
+            dialogVisible: false,
+            dialogType: TYPE_MAP.login
+        };
+    },
+    computed: {
+        isLogin () {
+            return this.$store.state.user.isLogin;
         },
-        computed: {
-            isLogin () {
-                return this.$store.state.user.isLogin;
-            },
-            name () {
-                return this.$store.state.user.userName;
+        name () {
+            return this.$store.state.user.userName;
+        }
+    },
+    watch: {
+        isLogin (isLogin) {
+            if (isLogin) {
+                this.dialogVisible = false;
             }
+        }
+    },
+    created () {
+        this.getUserInfo();
+    },
+    methods: {
+        setActiveTab () {
+            this.setNav(this.$route.path);
         },
-        created () {
-            this.getUserInfo();
+
+        setNav (tab) {
+            this.navs.forEach((nav) => {
+                nav.actived = nav.path === tab;
+            });
         },
-        methods: {
-            setActiveTab () {
-                this.setNav(this.$route.path);
-            },
 
-            setNav (tab) {
-                this.navs.forEach((nav) => {
-                    nav.actived = nav.path === tab;
-                });
-            },
+        onClickLogin () {
+            this.dialogVisible = true;
+            this.dialogType = TYPE_MAP.login;
+        },
 
-            onClickLogin () {
-                this.dialogVisible = true;
-                this.dialogType = TYPE_MAP.login;
-            },
-
-            onClickSignUp () {
-                this.dialogVisible = true;
-                this.dialogType = TYPE_MAP.sign;
-            },
-            async getUserInfo () {
-               const response = await this.Axios.post('/init', this.config);
-               if (response) {
-                   this.$store.dispatch('updateLoginInfo', response);
-                   if (response.isLogin) {
-                       this.dialogVisible = false;
-                   }
-               }
+        onClickSignUp () {
+            this.dialogVisible = true;
+            this.dialogType = TYPE_MAP.sign;
+        },
+        async getUserInfo () {
+            const response = await this.Axios.post('/init', this.config);
+            if (response) {
+                this.$store.dispatch('updateLoginInfo', response);
+                if (response.isLogin) {
+                    this.dialogVisible = false;
+                }
             }
-        },
-        components: {
-            Login,
-        },
-    };
+        }
+    }
+};
 </script>
 
 <style lang="less" scoped>
@@ -95,6 +113,8 @@
         text-align: center;
         background: #333333;
         height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     .index-header {
@@ -182,5 +202,9 @@
                 border-color: #00432a;
             }
         }
+    }
+
+    .content{
+        height: 100%;
     }
 </style>

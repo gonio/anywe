@@ -6,10 +6,11 @@ import logger from './logger';
  */
 
 export default {
-    install,
+    install
 };
 
 function install (Vue) {
+
     // Axios.defaults.headers.post['Content-Type'] = 'application/json';
     // Axios.defaults.baseURL = '/hyz';
     Axios.interceptors.response.use(({ data }) => {
@@ -29,7 +30,7 @@ function install (Vue) {
         Axios: {
             get () {
                 return Axios;
-            },
-        },
+            }
+        }
     });
 }

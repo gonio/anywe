@@ -1,43 +1,60 @@
 // initial state
 // shape: [{ id, quantity }]
+
 const state = {
-    roomName: '', // 房间名
-    roomID: 0, // 房间ID
-    indexID: 0, // 玩家排列序号，0为房主
-    others: [], // 其他玩家的进度
+    players: [], // 玩家信息
+    info: {
+        title: '',
+        id: ''
+    }
 };
 
 // getters
-const getters = {
-    roomID: (state) => state.roomID,
-    roomName: (state) => state.roomName,
-    isRoomOwner: (state) => state.indexID === 0,
-
-};
+const getters = {};
 
 // actions
 const actions = {
-    updateRoomInfo({ commit }, info) {
-        commit('setRoomInfo', info);
+    updatePlayersInfo ({ commit }, list) {
+        commit('setPlayersInfo', list);
     },
+    updateRoomInfo ({ commit }, info) {
+        commit('setRoomInfo', info);
+    }
 };
 
 // mutations
 const mutations = {
 
     /**
-     * 设置房间信息
-     * @param state
-     * @param info
+     * 设置玩家信息
+     * @param {object} state
+     * @param {array|string} list
      */
-    setRoomInfo(state, info) {
-        Object.assign(state, info);
+    setPlayersInfo (state, list) {
+        try {
+            list = JSON.parse(list);
+        } catch (e) {
+            if (!Array.isArray(list)) {
+                list = [];
+            }
+        }
+        state.players = list;
     },
+
+    /**
+     * 设置房间信息
+     * @param {object} state
+     * @param {object} info
+     */
+    setRoomInfo (state, info) {
+        Object.assign(state.info, info);
+    }
 };
 
 export default {
+    namespaced: true,
     state,
     getters,
     actions,
-    mutations,
+    mutations
 };
