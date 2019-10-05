@@ -79,4 +79,8 @@ export class Communicate {
     close () {
         this.ws.close();
     }
+
+    start () {
+        this.ws.send(JSON.stringify({ type: 'start', roomID: this.roomID }));
+    }
 }
