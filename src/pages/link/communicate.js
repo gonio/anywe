@@ -40,12 +40,19 @@ export class Communicate {
             }
             data = data.data;
             switch (data.type) {
+                case 'ready':
+                    vm.readyGame();
+                    break;
+
                 case 'start':
-                    vm.startGame();
+                    vm.startGame(data.players);
                     break;
 
                 case 'update':
                     vm.$store.dispatch('link/updatePlayersInfo', data.players);
+                    vm.$refs.displayPanel.update(_.filter(data.players, item => {
+                        return item.name !== vm.$store.state.user.userName;
+                    }));
                     break;
 
                 case 'gameOver':
@@ -80,7 +87,7 @@ export class Communicate {
         this.ws.close();
     }
 
-    start () {
-        this.ws.send(JSON.stringify({ type: 'start', roomID: this.roomID }));
+    start (map) {
+        this.ws.send(JSON.stringify({ type: 'start', roomID: this.roomID, map }));
     }
 }

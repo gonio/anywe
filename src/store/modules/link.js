@@ -3,6 +3,7 @@
 
 const state = {
     players: [], // 玩家信息
+    maps: [], // 其他玩家消除进度
     info: {
         title: '',
         id: ''
@@ -19,6 +20,9 @@ const actions = {
     },
     updateRoomInfo ({ commit }, info) {
         commit('setRoomInfo', info);
+    },
+    updatePlayersMap ({ commit }, maps) {
+        commit('setPlayersMap', maps);
     }
 };
 
@@ -48,6 +52,15 @@ const mutations = {
      */
     setRoomInfo (state, info) {
         Object.assign(state.info, info);
+    },
+
+    /**
+     * 设置其他玩家的进度信息
+     * @param {object} state
+     * @param {object} maps
+     */
+    setPlayersMap (state, maps) {
+        Object.assign(state.maps, maps);
     }
 };
 

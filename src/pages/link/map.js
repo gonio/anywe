@@ -1,15 +1,15 @@
 // 方块的类型
 const TYPE_MAP = {
-    0: 'glyphicon glyphicon-plus',
-    1: 'glyphicon glyphicon-cloud',
-    2: 'glyphicon glyphicon-off',
-    3: 'glyphicon glyphicon-signal',
-    4: 'glyphicon glyphicon-lock',
-    5: 'glyphicon glyphicon-tag',
-    6: 'glyphicon glyphicon-tint',
-    7: 'glyphicon glyphicon-eye-open',
-    8: 'glyphicon glyphicon-fire',
-    9: 'glyphicon glyphicon-heart-empty'
+    0: 'el-icon-eleme',
+    1: 'el-icon-delete',
+    2: 'el-icon-setting',
+    3: 'el-icon-user',
+    4: 'el-icon-phone-outline',
+    5: 'el-icon-star-off',
+    6: 'el-icon-goods',
+    7: 'el-icon-help',
+    8: 'el-icon-picture-outline-round',
+    9: 'el-icon-bell'
 };
 
 // 方块的状态css类名

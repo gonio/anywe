@@ -21,10 +21,6 @@ export default {
             type: Number,
             default: 0
         },
-        index: {
-            type: Number,
-            default: 0
-        },
         x: {
             type: Number,
             default: 0
@@ -37,12 +33,14 @@ export default {
     data () {
         return {
             selected: false,
-            isShown: this.isShow === 1,
             status: this.isShow === 1 ? 'show' : 'hide'
         };
     },
     computed: {
         showClass () {
+            if (this.isShow === 0) {
+                return STATUS_CLASS_MAP.hide;
+            }
             switch (this.status) {
                 case 'show':
                     return STATUS_CLASS_MAP.show;
@@ -58,6 +56,9 @@ export default {
         },
         showType () {
             return TYPE_MAP[this.type];
+        },
+        isShown () {
+            return this.isShow === 1;
         }
     },
     methods: {
@@ -112,7 +113,8 @@ export default {
     .block-item {
         .normal-block-item();
         border: 1px #424242 solid;
-        box-shadow: 3px 3px 3px 3px #ccc;
+        box-shadow: 1px 1px 1px 1px #ccc;
+        color: wheat;
         i {
             .normal-i()
         }
@@ -141,7 +143,7 @@ export default {
     }
 
     .is-selected {
-        box-shadow: 2px 2px 3px 1px red;
+        box-shadow: 1px 1px 1px 1px red;
         border: 1px red solid;
     }
 </style>

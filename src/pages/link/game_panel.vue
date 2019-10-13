@@ -1,13 +1,13 @@
 <template>
-    <div class="h110p w100p">
-        <block v-for="n in 400"
-               :key="n"
+    <div v-show="isStart"
+         class="w100p">
+        <block v-for="(item, index) in blocks"
+               :key="index"
                ref="blocks"
-               :index="n-1"
-               :is-show="map[n-1]"
-               :type="showType(map[n-1])"
-               :x="(n-1) % col"
-               :y="parseInt((n-1) / col, 10)"
+               :is-show="item.isShown"
+               :type="item.type"
+               :x="index % col"
+               :y="parseInt(index / col, 10)"
                @select="select" />
     </div>
 </template>
@@ -62,14 +62,31 @@ export default {
     components: {
         Block
     },
+    props: {
+        server: {
+            type: Object,
+            require: true,
+            default: () => {
+                return {};
+            }
+        }
+    },
     data () {
         return {
+            isStart: false,
             map: map1,
-            col: 20 // 列、排方块的数量
+            blockShowMap: {},
+            col: 20, // 列、排方块的数量
+            blockLimit: 400 // 方块的总数量
         };
     },
-    mounted () {
-        this.initCoordinate();
+    computed: {
+        blocks () {
+            return Object.values(this.blockShowMap).flat();
+        }
+    },
+    created () {
+        this.blockShowMap = [];
     },
     methods: {
 
@@ -79,7 +96,6 @@ export default {
         initCoordinate () {
             let i = 0;
             this.coordinate = {}; // block数组对象，前端自用
-            this.blockShowMap = {}; // block的isShown数组对象，用于和服务端同步
 
             this.$refs.blocks.forEach((item, key) => {
                 if (key % this.col === 0 && key !== 0) {
@@ -87,10 +103,36 @@ export default {
                 }
                 this.coordinate[i] = this.coordinate[i] || [];
                 this.coordinate[i].push(item);
-
-                this.blockShowMap[i] = this.blockShowMap[i] || [];
-                this.blockShowMap[i].push({ isShown: item.isShown });
             });
+        },
+
+        /**
+         * 初始化方块数据
+         * @param {object} blockShowMap 初始化方块数据
+         * @returns {object}
+         */
+        initCoordinateData (blockShowMap = {}) {
+            let i = 0;
+            if (_.isEmpty(blockShowMap)) {
+                for (let key = 0; key < this.blockLimit; key++) {
+                    if (key % this.col === 0 && key !== 0) {
+                        i++;
+                    }
+                    blockShowMap[i] = blockShowMap[i] || [];
+                    blockShowMap[i].push({ isShown: this.map[key], type: this.showType(this.map[key]) });
+                }
+            }
+            this.blockShowMap = blockShowMap;
+            return blockShowMap;
+        },
+
+        start () {
+            this.initCoordinate();
+            this.isStart = true;
+        },
+
+        over () {
+            this.isStart = false;
         },
 
         /**
@@ -182,8 +224,12 @@ export default {
         destroyBlock (block1, block2) {
             block1.hide();
             block2.hide();
-            this.blockShowMap[block1.y][block1.x] = { isShown: false };
-            this.blockShowMap[block2.y][block2.x] = { isShown: false };
+            this.blockShowMap[block1.y][block1.x] = { isShown: 0 };
+            this.blockShowMap[block2.y][block2.x] = { isShown: 0 };
+            this.server.send({
+                type: 'update',
+                map: this.blockShowMap
+            });
         },
 
         /**
@@ -240,8 +286,7 @@ export default {
         getBlockXRange (block) {
             const [blockX, blockY] = [block.x, block.y];
             let block1 = this.coordinate[blockY][0];
-            let
-                block2 = this.coordinate[blockY][this.col - 1];
+            let block2 = this.coordinate[blockY][this.col - 1];
 
             // 左边边界方块
             if (blockX === 0) {

@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import _ from 'lodash';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import '../style/common.less';
@@ -11,6 +12,8 @@ import store from '../store';
 Vue.use(Vuex);
 Vue.use(ElementUI);
 Vue.use(ajax);
+
+window._ = _;
 
 // eslint-disable-next-line no-new
 new Vue({
