@@ -1,19 +1,24 @@
 <template>
     <div class="room-container">
-        <div style="height: 5%;width: 100%;">
+        <div style="height: 5%;width: 100%;"
+             class="name">
             {{ title }}
         </div>
         <div v-for="index in limit"
              :key="index"
-             class="box">
-            <div>{{ players[index-1]?players[index-1].name:'' }}</div>
+             class="box rel">
+            <div class="name">
+                {{ players[index-1]?players[index-1].name:'' }}
+            </div>
             <el-button v-if="isOwner && index !==1"
-                       @click="onClickKick(players[index-1])">
-                踢
-            </el-button>
+                       type="warning"
+                       icon="el-icon-close"
+                       class="kick"
+                       circle
+                       @click="onClickKick(players[index-1])" />
             <div v-if="players[index-1]&&players[index-1].isReady"
                  class="ready">
-                准备
+                已准备
             </div>
         </div>
     </div>
@@ -60,7 +65,7 @@ export default {
     },
     watch: {
         players (players) {
-            const isExist = players.some(item => item.name  === this.name);
+            const isExist = players.some(item => item.name === this.name);
             if (!isExist) {
                 this.$alert('您已经被请离房间');
                 this.$emit('kick');
@@ -74,7 +79,10 @@ export default {
         init () {
         },
         onClickKick (player = {}) {
-            this.server.send({ type: 'kick', id: player.name });
+            this.server.send({
+                type: 'kick',
+                id: player.name
+            });
         }
     }
 };
@@ -97,10 +105,24 @@ export default {
     }
 
     .ready {
-        border: 1px solid #ffffff;
-        background: #cccccc;
-        border-radius: 5px;
-        width: 48%;
-        height: 30px;
+        background: #409EFF;
+        height: 50px;
+        line-height: 50px;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        color: #eeeeff;
+        font-size: 30px;
+    }
+
+    .kick {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+
+    .name{
+        color: #eeeeff;
+        font-size: 30px;
     }
 </style>
