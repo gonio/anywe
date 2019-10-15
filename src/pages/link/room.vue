@@ -10,7 +10,7 @@
             <div class="name">
                 {{ players[index-1]?players[index-1].name:'' }}
             </div>
-            <el-button v-if="isOwner && index !==1"
+            <el-button v-if="isShowKick(players[index-1])"
                        type="warning"
                        icon="el-icon-close"
                        class="kick"
@@ -83,6 +83,9 @@ export default {
                 type: 'kick',
                 id: player.name
             });
+        },
+        isShowKick (player) {
+            return player && !player.isOwner;
         }
     }
 };

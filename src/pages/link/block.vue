@@ -33,7 +33,8 @@ export default {
     data () {
         return {
             selected: false,
-            status: this.isShow === 1 ? 'show' : 'hide'
+            status: this.isShow === 1 ? 'show' : 'hide',
+            isShown: this.isShow === 1
         };
     },
     computed: {
@@ -56,9 +57,13 @@ export default {
         },
         showType () {
             return TYPE_MAP[this.type];
-        },
-        isShown () {
-            return this.isShow === 1;
+        }
+    },
+    watch: {
+        isShow (value) {
+            if (value) {
+                this.isShown = this.isShow === 1;
+            }
         }
     },
     methods: {

@@ -52,16 +52,18 @@
                 </el-button>
             </div>
         </div>
-        <div v-show="status === statusMap.start">
+        <div v-if="status === statusMap.start">
             <el-button @click="onclickQuit">
                 退出
             </el-button>
             <div class="display-box-container">
                 <display-panel ref="displayPanel"
-                               class="display-box-item" />
+                               class="display-box-item"
+                               @hook:mounted="onDisplayMounted" />
             </div>
             <game-panel ref="gamePanel"
                         class="index-content"
+                        :block-show-map="blockShowMap"
                         :server="server"
                         @gameOver="gameOver" />
         </div>
@@ -89,6 +91,7 @@
 <script>
 
 import { Communicate } from './communicate';
+import { map1, initCoordinateData } from './map';
 import GamePanel from './game_panel';
 import DisplayPanel from './display_panel';
 import Room from './room';
@@ -110,6 +113,7 @@ export default {
     },
     data () {
         return {
+            blockShowMap: {},
             col: 20, // 列、排方块的数量
             statusMap: STATUS_MAP,
             status: STATUS_MAP.init, // STATUS_MAP
@@ -136,18 +140,15 @@ export default {
     methods: {
 
         /**
-         * 游戏结束gg
+         * 游戏结束
+         * @param {string} name
          */
-        gameOver () {
-            this.status = STATUS_MAP.over;
-        },
-
-        /**
-         * 游戏赢了
-         */
-        win () {
-            this.status = STATUS_MAP.win;
-            this.server.send({ type: 'win' });
+        over (name) {
+            if (name === this.name) {
+                this.status = STATUS_MAP.win;
+            } else {
+                this.status = STATUS_MAP.over;
+            }
         },
         createGame () {
             this.status = STATUS_MAP.create;
@@ -167,23 +168,21 @@ export default {
             }
         },
         startGame (info) {
+            this.status = STATUS_MAP.start;
+            this.serverInfo = info;
 
-            // 非房主先初始化地图数据
             if (!this.isOwner) {
-                this.status = STATUS_MAP.start;
-                this.$refs.gamePanel.initCoordinateData(info[0].map);
+                this.blockShowMap = info[0].map;
             }
-
-            // 把对手的图渲染出来
-            this.$refs.displayPanel.update(info);
-
-            // 开始游戏了
-            this.$nextTick(() => this.$refs.gamePanel.start());
         },
         toServerStart () {
-            this.status = STATUS_MAP.start;
-            const map = this.$refs.gamePanel.initCoordinateData();
-            this.server.start(map);
+            this.blockShowMap = initCoordinateData({ map: map1 });
+            this.server.start(this.blockShowMap);
+        },
+        onDisplayMounted () {
+
+            // 把对手的图渲染出来
+            this.$refs.displayPanel.update(this.serverInfo);
         },
         onclickReady () {
             if (this.isOwner) {

@@ -50,7 +50,7 @@ export class Communicate {
 
                 case 'update':
                     vm.$store.dispatch('link/updatePlayersInfo', data.players);
-                    vm.$refs.displayPanel.update(_.filter(data.players, item => {
+                    vm.$refs.displayPanel && vm.$refs.displayPanel.update(_.filter(data.players, item => {
                         return item.name !== vm.$store.state.user.userName;
                     }));
                     break;
@@ -59,8 +59,8 @@ export class Communicate {
                     vm.gameOver();
                     break;
 
-                case 'win':
-                    vm.win();
+                case 'over':
+                    vm.over(data.name);
                     break;
 
                 case 'quit':

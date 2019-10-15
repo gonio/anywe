@@ -1,6 +1,5 @@
 <template>
-    <div v-show="isStart"
-         class="w100p">
+    <div class="w100p">
         <block v-for="(item, index) in blocks"
                :key="index"
                ref="blocks"
@@ -14,48 +13,8 @@
 
 <script>
 
-import { getRandom } from '../../util/util';
 import Block from './block';
-import { map1, type } from './map';
-
-/**
- * 获取随机方块类型
- * @returns {number}
- */
-function getType () {
-    const random = getRandom();
-    if (type[random] < 1) {
-        return getExistType(random);
-    }
-    type[random]--;
-    return random;
-}
-
-/**
- * 根据当前的随机数，寻找其右边、左边的还剩下的方块类型
- * @param {number} random        随机数
- * @returns         {number}
- */
-function getExistType (random = 0) {
-    const typeNum = 10;
-
-    // 先寻找右边的还存在的类型
-    for (; random < typeNum; random++) {
-        if (type[random] > 0) {
-            type[random]--;
-            return random;
-        }
-    }
-
-    // 在寻找其左边的还存在的类型
-    for (let i = 0; i < random; i++) {
-        if (type[i] > 0) {
-            type[i]--;
-            return i;
-        }
-    }
-    return -1;
-}
+import { map1 } from './map';
 
 export default {
     name: 'GamePanel',
@@ -69,15 +28,20 @@ export default {
             default: () => {
                 return {};
             }
+        },
+        blockShowMap: {
+            type: Object,
+            require: true,
+            default: () => {
+                return {};
+            }
         }
     },
     data () {
         return {
-            isStart: false,
+            count: 0, // 方块的数量
             map: map1,
-            blockShowMap: {},
-            col: 20, // 列、排方块的数量
-            blockLimit: 400 // 方块的总数量
+            col: 20 // 列、排方块的数量
         };
     },
     computed: {
@@ -85,8 +49,8 @@ export default {
             return Object.values(this.blockShowMap).flat();
         }
     },
-    created () {
-        this.blockShowMap = [];
+    mounted () {
+        this.initCoordinate();
     },
     methods: {
 
@@ -103,49 +67,12 @@ export default {
                 }
                 this.coordinate[i] = this.coordinate[i] || [];
                 this.coordinate[i].push(item);
+                if (item.isShown) {
+                    this.count++;
+                }
             });
         },
 
-        /**
-         * 初始化方块数据
-         * @param {object} blockShowMap 初始化方块数据
-         * @returns {object}
-         */
-        initCoordinateData (blockShowMap = {}) {
-            let i = 0;
-            if (_.isEmpty(blockShowMap)) {
-                for (let key = 0; key < this.blockLimit; key++) {
-                    if (key % this.col === 0 && key !== 0) {
-                        i++;
-                    }
-                    blockShowMap[i] = blockShowMap[i] || [];
-                    blockShowMap[i].push({ isShown: this.map[key], type: this.showType(this.map[key]) });
-                }
-            }
-            this.blockShowMap = blockShowMap;
-            return blockShowMap;
-        },
-
-        start () {
-            this.initCoordinate();
-            this.isStart = true;
-        },
-
-        over () {
-            this.isStart = false;
-        },
-
-        /**
-         * 显示类型的计算
-         * @param {number} isShow       1为显示，0为隐藏
-         * @returns {number}
-         */
-        showType (isShow) {
-            if (isShow === 1) {
-                return getType();
-            }
-            return -1;
-        },
         select (block) {
 
             // 不是点击同一个方块，要判断能不能消除
@@ -226,6 +153,12 @@ export default {
             block2.hide();
             this.blockShowMap[block1.y][block1.x] = { isShown: 0 };
             this.blockShowMap[block2.y][block2.x] = { isShown: 0 };
+            this.count += -2;
+
+            if (this.count === 0) {
+                this.server.send({ type: 'win' });
+                return;
+            }
             this.server.send({
                 type: 'update',
                 map: this.blockShowMap

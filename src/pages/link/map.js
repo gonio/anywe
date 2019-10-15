@@ -1,3 +1,5 @@
+import { getRandom } from '../../util/util';
+
 // 方块的类型
 const TYPE_MAP = {
     0: 'el-icon-eleme',
@@ -58,9 +60,84 @@ const type = {
     9: 22
 };
 
+/**
+ * 初始化方块数据
+ * @param {number} blockLimit
+ * @param {object} blockShowMap 初始化方块数据
+ * @param {number} col
+ * @param {array} map
+ * @returns {object}
+ */
+function initCoordinateData ({ blockLimit = 400, blockShowMap = {}, col = 20, map }) {
+    let i = 0;
+    if (_.isEmpty(blockShowMap)) {
+        for (let key = 0; key < blockLimit; key++) {
+            if (key % col === 0 && key !== 0) {
+                i++;
+            }
+            blockShowMap[i] = blockShowMap[i] || [];
+            blockShowMap[i].push({ isShown: map[key], type: showType(map[key]) });
+        }
+    }
+    return blockShowMap;
+}
+
 export {
+    initCoordinateData,
     map1,
     type,
     TYPE_MAP,
     STATUS_CLASS_MAP
 };
+
+
+/**
+ * 获取随机方块类型
+ * @returns {number}
+ */
+function getType () {
+    const random = getRandom();
+    if (type[random] < 1) {
+        return getExistType(random);
+    }
+    type[random]--;
+    return random;
+}
+
+/**
+ * 根据当前的随机数，寻找其右边、左边的还剩下的方块类型
+ * @param {number} random        随机数
+ * @returns         {number}
+ */
+function getExistType (random = 0) {
+    const typeNum = 10;
+
+    // 先寻找右边的还存在的类型
+    for (; random < typeNum; random++) {
+        if (type[random] > 0) {
+            type[random]--;
+            return random;
+        }
+    }
+
+    // 在寻找其左边的还存在的类型
+    for (let i = 0; i < random; i++) {
+        if (type[i] > 0) {
+            type[i]--;
+            return i;
+        }
+    }
+    return -1;
+}
+
+/**
+ * 显示类型的计算
+ * @param {number} isShow       1为显示，0为隐藏
+ * @returns {number}
+ */
+function showType (isShow) {
+    if (isShow === 1) {
+        return getType();
+    }
+    return -1;
+}
