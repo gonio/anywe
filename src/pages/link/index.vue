@@ -10,8 +10,7 @@
                     刷新
                 </el-button>
             </div>
-            <div v-show="status === statusMap.create">
-                <div>等待玩家准备</div>
+            <div v-show="status === statusMap.join">
                 <el-button v-if="isOwner"
                            @click="onclickReady">
                     开始
@@ -24,26 +23,7 @@
                     退出
                 </el-button>
             </div>
-            <div v-show="status === statusMap.join">
-                <div>等待玩家准备</div>
-                <el-button @click="onclickReady">
-                    准备
-                </el-button>
-                <el-button @click="onclickQuit">
-                    退出
-                </el-button>
-            </div>
             <div v-show="status === statusMap.over">
-                <div>输了</div>
-                <el-button @click="onclickReady">
-                    准备
-                </el-button>
-                <el-button @click="onclickQuit">
-                    退出
-                </el-button>
-            </div>
-            <div v-show="status === statusMap.win">
-                <div>赢了</div>
                 <el-button @click="onclickReady">
                     准备
                 </el-button>
@@ -65,7 +45,7 @@
                         class="index-content"
                         :block-show-map="blockShowMap"
                         :server="server"
-                        @gameOver="gameOver" />
+                        @gameOver="over" />
         </div>
         <div v-if="status === statusMap.init">
             <div v-for="(item,index) in roomList"
@@ -98,7 +78,6 @@ import Room from './room';
 
 const STATUS_MAP = {
     init: 1,
-    create: 2,
     join: 3,
     start: 4,
     over: 5,
@@ -144,14 +123,20 @@ export default {
          * @param {string} name
          */
         over (name) {
-            if (name === this.name) {
-                this.status = STATUS_MAP.win;
-            } else {
-                this.status = STATUS_MAP.over;
+            let msg = '赢啦，点击返回房间';
+            if (name !== this.name) {
+                msg = '输了，点击返回房间';
             }
+            this.$confirm(msg)
+                .then(() => {
+                    this.status = STATUS_MAP.join;
+                })
+                .catch(() => {
+                    this.status = STATUS_MAP.init;
+                });
         },
         createGame () {
-            this.status = STATUS_MAP.create;
+            this.status = STATUS_MAP.join;
             this.isOwner = true;
             this.server = new Communicate({
                 vm: this,

@@ -55,10 +55,6 @@ export class Communicate {
                     }));
                     break;
 
-                case 'gameOver':
-                    vm.gameOver();
-                    break;
-
                 case 'over':
                     vm.over(data.name);
                     break;

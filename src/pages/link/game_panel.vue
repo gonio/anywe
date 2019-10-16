@@ -80,9 +80,6 @@ export default {
                 if (this.canDestroy(this.block, block)) {
                     this.destroyBlock(this.block, block);
                     this.block = null;
-                    if (this.checkAllDestroy()) {
-                        this.$emit('gameOver');
-                    }
                 } else {
                     block.select();
                     this.block.deselect();
@@ -163,14 +160,6 @@ export default {
                 type: 'update',
                 map: this.blockShowMap
             });
-        },
-
-        /**
-         * 检查是否全部消除完毕
-         * @returns {boolean}
-         */
-        checkAllDestroy () {
-            return !this.$refs.blocks.find((item) => item.isExist());
         },
 
         /**
