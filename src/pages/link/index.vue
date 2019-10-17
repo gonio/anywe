@@ -3,7 +3,7 @@
         <div v-show="status !== statusMap.start"
              class="top">
             <div v-show="status === statusMap.init">
-                <el-button @click="createGame">
+                <el-button @click="dialogVisible = true">
                     创建游戏
                 </el-button>
                 <el-button @click="listGame">
@@ -65,6 +65,21 @@
                   :server="server"
                   @kick="onclickQuit" />
         </div>
+        <el-dialog :visible.sync="dialogVisible"
+                   :close-on-click-modal="false">
+            <div v-if="!isLogin">
+                <create-room ref="createRoom" />
+            </div>
+            <div slot="footer">
+                <el-button type="primary"
+                           @click="createGame">
+                    确 定
+                </el-button>
+                <el-button @click="dialogVisible = false">
+                    取 消
+                </el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -75,6 +90,7 @@ import { map1, initCoordinateData } from './map';
 import GamePanel from './game_panel';
 import DisplayPanel from './display_panel';
 import Room from './room';
+import CreateRoom from './create_room';
 
 const STATUS_MAP = {
     init: 1,
@@ -86,12 +102,14 @@ const STATUS_MAP = {
 
 export default {
     components: {
+        CreateRoom,
         GamePanel,
         DisplayPanel,
         Room
     },
     data () {
         return {
+            dialogVisible: false,
             blockShowMap: {},
             col: 20, // 列、排方块的数量
             statusMap: STATUS_MAP,
@@ -138,12 +156,13 @@ export default {
         createGame () {
             this.status = STATUS_MAP.join;
             this.isOwner = true;
+            this.dialogVisible = false;
             this.server = new Communicate({
                 vm: this,
-                data: {
+                data: Object.assign({
                     isRoomOwner: true,
                     roomID: this.name
-                }
+                }, this.$refs.createRoom.getValue())
             });
         },
         async listGame () {
